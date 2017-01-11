@@ -19,7 +19,8 @@ object HaarWavelet {
     //println(samples)
     //println(samples(0))
     //println(samples.length)
-    for (i <- 0 to samples.length-1){
+    for (i <- 0 until samples.length){
+      println( "Input:        " + samples(i).mkString("[" ," ," ,"]"))
       val ubound = samples(i).max+1
       //println(ubound)
       val length = samples(i).length
@@ -27,13 +28,12 @@ object HaarWavelet {
       val deltas1 = encode(samples(i), ubound)
       //println(deltas1)
       val deltas = deltas1._1
-      println(deltas)
+     // println(deltas)
       val avg = deltas1._2
 
-
-      println( "Input:      %s, boundary = %s, length = %s" format(samples(i), ubound, length))
-      println( "Haar output:%s, average = %s" format(deltas, avg))
-      //println("Decoded:    %s" format(decode(deltas, avg, ubound)))
+      println( "Input:        boundary = %s, length = %s" format (ubound, length))
+      println( "Haar output:  %s, average = %s" format(deltas.mkString("[" ," ," ,"]"), avg))
+      //println( "Decoded:      %s" format(decode(deltas1._1, avg, ubound)))
       println("\n")
     }
   }
@@ -74,31 +74,27 @@ object HaarWavelet {
     (deltas, avg%ubound)
   }
 
-  def decode(deltas:ListBuffer[Int],avg:Int,ubound:Int):ListBuffer[Int]={
+  def decode(deltas:ListBuffer[Int],avg:Int,ubound:Int):String={
     var avgs = new ListBuffer[Int]
     avgs += avg
-    var l = 1
 
     while(deltas.nonEmpty){
-      for(i <- 0 to l ){
+      var l = 1
+      for(i <- 0 to l-1 ){
         val delta = deltas.last
         deltas.remove(deltas.length-1)
-        println(deltas)
         val avg = avgs.last
-        println(avg)
         avgs.remove(0)
-        println(avgs)
 
         val a = wrap(math.ceil(avg-delta/2.0).toInt,ubound)
         val b = wrap(math.ceil(avg+delta/2.0).toInt,ubound)
 
         avgs += a
         avgs += b
-        println("here" + avgs)
       }
       l*=2
     }
-    avgs
+    avgs.mkString("[", ", ", "]")
   }
 
   def is_pow2(n:Int):Boolean={
