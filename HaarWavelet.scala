@@ -1,5 +1,6 @@
 /**
-  * Created by vipul vaibhaw on 1/11/2017.
+  * Author vipul vaibhaw on 1/11/2017.
+  * Inspired by https://gist.github.com/boukeversteegh/0852313953eac565b708
   */
 
 import scala.collection.mutable.ListBuffer
