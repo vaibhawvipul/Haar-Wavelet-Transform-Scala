@@ -2,39 +2,37 @@
   * Created by vipul vaibhaw on 1/11/2017.
   */
 
-import scala.collection.mutable.{ListBuffer, MutableList,ArrayBuffer}
+import scala.collection.mutable.ListBuffer
 
 object HaarWavelet {
 
   def main(args: Array[String]): Unit = {
-    var samples = ListBuffer(
+    val samples = ListBuffer(
       ListBuffer(1,4),
       ListBuffer(6,1),
       ListBuffer(0,2,4,6,7,7,7,7),
       ListBuffer(1,2,3,4),
       ListBuffer(7,5,1,6,3,0,2,4),
-    ListBuffer(3,2,3,7,5,5,1,1,0,2,5,1,2,0,1,2,0,2,1,0,0,2,1,2,0,2,1,0,0,2,1,2)
+      ListBuffer(0),
+      ListBuffer(3,2,3,7,5,5,1,1,0,2,5,1,2,0,1,2,0,2,1,0,0,2,1,2,0,2,1,0,0,2,1,2),
+      ListBuffer(1,2,3,4,5,6,7,8,9)
     )
 
-    //println(samples)
-    //println(samples(0))
-    //println(samples.length)
-    for (i <- 0 until samples.length){
-      println( "Input:        " + samples(i).mkString("[" ," ," ,"]"))
-      val ubound = samples(i).max+1
-      //println(ubound)
-      val length = samples(i).length
-      //println(length)
-      val deltas1 = encode(samples(i), ubound)
-      //println(deltas1)
-      val deltas = deltas1._1
-     // println(deltas)
-      val avg = deltas1._2
+    for (i <- samples.indices){
+      if(is_pow2(samples(i).length) & samples(i).length >= 2){
+        println( "Input:        " + samples(i).mkString("[" ," ," ,"]"))
+        val ubound = samples(i).max+1
+        val length = samples(i).length
+        val deltas = encode(samples(i), ubound)
+        val avg = deltas._2
 
-      println( "Input:        boundary = %s, length = %s" format (ubound, length))
-      println( "Haar output:  %s, average = %s" format(deltas.mkString("[" ," ," ,"]"), avg))
-      //println( "Decoded:      %s" format(decode(deltas1._1, avg, ubound)))
-      println("\n")
+        println( "Input:        boundary = %s, length = %s" format (ubound, length))
+        println( "Haar output:  %s, average = %s" format(deltas._1.mkString("[" ," ," ,"]"), avg))
+        println( "Decoded:      " +decode(deltas._1, avg, ubound))
+        println("\n")
+      }
+      else
+        println("List length should be a power of 2, and larger than 2\n")
     }
   }
 
@@ -43,8 +41,6 @@ object HaarWavelet {
   }
 
   def encode(lst1:ListBuffer[Int], ubound:Int):(ListBuffer[Int],Int)={
-    //var lst = ListBuffer[Int]()
-    //lst1.foreach(x=>lst+=x)
     var lst = lst1
     var deltas = new ListBuffer[Int]()
     var avg = 0
@@ -77,22 +73,28 @@ object HaarWavelet {
   def decode(deltas:ListBuffer[Int],avg:Int,ubound:Int):String={
     var avgs = new ListBuffer[Int]
     avgs += avg
-
+    var l:Int = 1
     while(deltas.nonEmpty){
-      var l = 1
-      for(i <- 0 to l-1 ){
+      var i = 0
+      while(i < l ){
         val delta = deltas.last
         deltas.remove(deltas.length-1)
         val avg = avgs.last
-        avgs.remove(0)
+        avgs.remove(avgs.length-1)
 
         val a = wrap(math.ceil(avg-delta/2.0).toInt,ubound)
         val b = wrap(math.ceil(avg+delta/2.0).toInt,ubound)
 
-        avgs += a
+        //Prepending elements to ListBuffer
+        avgs = avgs.reverse
         avgs += b
+        avgs += a
+        avgs = avgs.reverse
+
+        i=i+1
+
       }
-      l*=2
+      l=l*2
     }
     avgs.mkString("[", ", ", "]")
   }
